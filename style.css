@@ -1,0 +1,192 @@
+@import url(https://fonts.googleapis.com/css?family=Lato:300italic);
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: #ee9ca7;
+}
+
+#cake {
+  display: block;
+  position: relative;
+  margin: -10em auto 0 auto;
+}
+
+/* ============================================== Candle
+*/
+
+.candles {
+    position: absolute;
+    top: 228px;
+    left: 50.5%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+  }
+  
+.velas {
+  background: #ffffff;
+  border-radius: 10px;
+  top: 228px;
+  left: 50%;
+  margin-left: -2.4px;
+  margin-top: -8.33333333px;
+  width: 5px;
+  height: 35px;
+  transform: translateY(-300px);
+  backface-visibility: hidden;
+  animation: in 500ms 6s ease-out forwards;
+}
+.velas:after,
+.velas:before {
+  background: rgba(255, 0, 0, 0.4);
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2.22222222px;
+}
+.velas:after {
+  top: 25%;
+  left: 0;
+}
+.velas:before {
+  top: 45%;
+  left: 0;
+}
+.velas:nth-child(odd) .fuego {
+    animation-delay: 6.6s;
+  }
+  
+  .velas:nth-child(even) .fuego {
+    animation-delay: 6.8s;
+  }
+
+.velas:nth-child(1) { background: #ffffff; }
+.velas:nth-child(2) { background: #ffcccb; }
+.velas:nth-child(3) { background: #ffd966; }
+.velas:nth-child(4) { background: #c6e2ff; }
+.velas:nth-child(5) { background: #d5f5c8; }
+
+
+
+/* ============================================== Fire
+*/
+
+.fuego {
+  border-radius: 100%;
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  margin-left: -2.6px;
+  width: 6.66666667px;
+  height: 18px;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+
+}
+.fuego:nth-child(1) {
+  animation: fuego 2s 6.5s infinite;
+}
+.fuego:nth-child(2) {
+  animation: fuego 1.5s 6.5s infinite;
+}
+.fuego:nth-child(3) {
+  animation: fuego 1s 6.5s infinite;
+}
+.fuego:nth-child(4) {
+  animation: fuego 0.5s 6.5s infinite;
+}
+.fuego:nth-child(5) {
+  animation: fuego 0.2s 6.5s infinite;
+}
+
+  .fuego.blown-out {
+    animation: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    opacity: 0;
+    transform: translateY(-30px) scale(0);
+  }
+  
+  .fuego.relight {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  
+.fuego.blown-out::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 6px;
+    height: 6px;
+    background: rgba(200, 200, 200, 0.6);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    animation: smoke 1.5s ease-out forwards;
+  }
+
+/* ============================================== Animation Fire and smoke
+*/
+
+@keyframes fuego {
+  0%, 100% {
+    background: rgba(254, 248, 97, 0.5);
+    box-shadow: 0 0 40px 10px rgba(248, 233, 209, 0.2);
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    background: rgba(255, 50, 0, 0.1);
+    box-shadow: 0 0 40px 20px rgba(248, 233, 209, 0.2);
+    transform: translateY(-20px) scale(0);
+  }
+}
+  
+  @keyframes smoke {
+    0% {
+      opacity: 0.8;
+      transform: translate(-50%, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -30px) scale(2);
+    }
+  }
+
+@keyframes in {
+  to {
+    transform: translateY(0);
+  }
+}
+
+.confetti {
+    position: fixed;
+    top: -10px;
+    width: 8px;
+    height: 8px;
+    opacity: 0.9;
+    pointer-events: none;
+    animation: confetti-fall 3s linear forwards;
+  }
+  
+  @keyframes confetti-fall {
+    to {
+      transform: translateY(110vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+  
+
+.text {
+  color: #8b6a60;
+  font-family: 'Lato', sans-serif;
+  font-weight: 300;
+  font-style:italic;
+  text-align: center;
+  h1 {
+    font-size: 1.4em;
+  }
+}  
