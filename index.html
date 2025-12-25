@@ -194,72 +194,56 @@
 
 
     <script>
-        let blownOut = false;
         let blowCount = 0;
-        let relightTimeout = null;
         let micStream = null;
+        let blowCooldown = false; // prevent multiple triggers from a single blow
 
 
-        // Partial / full blow logic
+        let candlesRevealed = false; // 🎂 Only allow blowing after reveal
+
+        function revealCandles() {
+            // Example: make flames visible (or play animation)
+            document.querySelectorAll('.fuego').forEach(flame => {
+                flame.style.opacity = 1; // or remove 'hidden' class
+            });
+
+            candlesRevealed = true;
+        }
+
+        // Blow logic
         function blowOutCandles() {
-            if (blownOut) return;
+            if (!candlesRevealed) return; // 🚫 Don’t blow before reveal
 
             const flames = Array.from(document.querySelectorAll('.fuego'));
             blowCount++;
 
-            if (blowCount < 2) {
-                // Partial blow (60% of candles)
-                const blowRatio = 0.6;
+            if (blowCount === 1) {
+                // First blow → ~60% of candles go out
+                const blowRatio = 0.9;
                 flames.forEach(flame => {
-                    if (!flame.classList.contains('blown-out') && Math.random() < blowRatio) {
+                    if (Math.random() < blowRatio) {
                         flame.classList.add('blown-out');
-                        flame.classList.remove('relight');
                     }
                 });
-            } else {
-                // Full blow: all remaining flames go out
-                flames.forEach(flame => {
-                    flame.classList.add('blown-out');
-                    flame.classList.remove('relight');
-                });
-            }
+            } else if (blowCount === 2) {
+                // Second blow → all remaining candles go out
+                flames.forEach(flame => flame.classList.add('blown-out'));
 
-            // Relight only for partial blows
-            if (blowCount < 2) {
-                blownOut = true;
-                relightTimeout = setTimeout(relightCandles, 5000);
-            } else {
-                // Final blow → don’t relight
-                blownOut = true;
-                markFinalBlown();
+                // Confetti + music
+                launchConfetti(100);
+                const music = document.getElementById("birthday-music");
+                music.play().catch(err => console.log("Autoplay blocked:", err));
+
+                // Stop mic if using mic detection
+                if (micStream) {
+                    micStream.getTracks().forEach(track => track.stop());
+                    micStream = null;
+                }
             }
         }
 
-        // Relight partial blown candles
-        function relightCandles() {
-            document.querySelectorAll('.fuego').forEach(flame => {
-                if (!flame.classList.contains('final-blown')) {
-                    flame.classList.remove('blown-out');
-                    flame.classList.add('relight');
-                }
-            });
-            blownOut = false;
-        }
-
-        // Optional: mark all candles as final-blown after 2nd blow
-        function markFinalBlown() {
-            document.querySelectorAll('.fuego').forEach(flame => {
-                if (!flame.classList.contains('blown-out')) {
-                    flame.classList.add('blown-out');
-                    flame.classList.add('final-blown');
-                }
-            });
-
-            const music = document.getElementById("birthday-music");
-            music.play().catch(err => console.log("Autoplay blocked:", err));
-            // 🎆 Confetti for every blow
-            launchConfetti(100);
-        }
+        // Example: reveal candles after a delay
+        setTimeout(revealCandles, 7000); // reveal after 7 seconds
         
         // ---- Click & keyboard fallback ----
         document.addEventListener('keydown', e => {
@@ -284,8 +268,14 @@
 
                     let volume = data.reduce((a, b) => a + b) / data.length;
 
-                    if (volume > 60) {
+                    if (volume > 80 && !blowCooldown) {
                         blowOutCandles();
+                        blowCooldown = true;
+
+                        // Reset cooldown after a short delay (e.g., 1 second)
+                        setTimeout(() => {
+                            blowCooldown = false;
+                        }, 1000);
                     }
 
                     requestAnimationFrame(detectBlow);
