@@ -190,10 +190,15 @@
 
     </div>
 
+    <audio id="birthday-music" src="happy_birthday.mp3" preload="auto"></audio>
+
+
     <script>
         let blownOut = false;
         let blowCount = 0;
         let relightTimeout = null;
+        let micStream = null;
+
 
         // Partial / full blow logic
         function blowOutCandles() {
@@ -249,6 +254,9 @@
                     flame.classList.add('final-blown');
                 }
             });
+
+            const music = document.getElementById("birthday-music");
+            music.play().catch(err => console.log("Autoplay blocked:", err));
             // 🎆 Confetti for every blow
             launchConfetti(100);
         }
@@ -261,39 +269,47 @@
         // ---- Microphone blow detection ----
         async function initMicrophone() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 const analyser = audioContext.createAnalyser();
-        
-                const mic = audioContext.createMediaStreamSource(stream);
+
+                const mic = audioContext.createMediaStreamSource(micStream);
                 mic.connect(analyser);
-        
+
                 analyser.fftSize = 256;
                 const data = new Uint8Array(analyser.frequencyBinCount);
-        
+
                 function detectBlow() {
                     analyser.getByteFrequencyData(data);
-        
+
                     let volume = data.reduce((a, b) => a + b) / data.length;
-        
-                    // 👇 Blow threshold (tweak if needed)
+
                     if (volume > 60) {
                         blowOutCandles();
                     }
-        
+
                     requestAnimationFrame(detectBlow);
                 }
-        
+
                 detectBlow();
             } catch (err) {
                 console.warn('Microphone access denied:', err);
             }
         }
+
         
         // Start mic after user interaction (browser requirement)
-        document.addEventListener('click', initMicrophone, { once: true });
+        document.addEventListener('click', () => {
+            initMicrophone();
+        }, { once: true });
 
         function launchConfetti(count = 80) {
+            // Stop microphone
+            if (micStream) {
+                micStream.getTracks().forEach(track => track.stop());
+                micStream = null;
+            }
+
             const colors = ['#ff4d6d', '#ffd166', '#06d6a0', '#4cc9f0', '#c77dff'];
 
             for (let i = 0; i < count; i++) {
@@ -307,8 +323,12 @@
                 document.body.appendChild(piece);
                 setTimeout(() => piece.remove(), 4000);
             }
-        }
+
+            // Play music after stopping mic
+            const music = document.getElementById("birthday-music");
+            music.play().catch(err => console.log("Autoplay blocked:", err));
+                }
         </script>
-        
+
 </body>
 </html>
