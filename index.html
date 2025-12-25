@@ -209,7 +209,7 @@
 
             if (blowCount < 2) {
                 // Partial blow (60% of candles)
-                const blowRatio = 0.9;
+                const blowRatio = 0.6;
                 flames.forEach(flame => {
                     if (!flame.classList.contains('blown-out') && Math.random() < blowRatio) {
                         flame.classList.add('blown-out');
